@@ -3,9 +3,10 @@ import { Type } from 'class-transformer';
 import { ITransportFabricRequestPayload } from './ITransportFabricRequestPayload';
 import { TransportFabricCommandOptions } from './TransportFabricCommandOptions';
 import * as _ from 'lodash';
-import { Transport } from '@ts-core/common';
+import { TransformUtil, Transport, TransportInvalidDataError, ValidateUtil } from '@ts-core/common';
 import { TransportCryptoManagerEd25519 } from '@ts-core/common';
 import { ITransportFabricCommandOptions } from './ITransportFabricCommandOptions';
+import { TRANSPORT_FABRIC_METHOD } from './constants';
 
 export class TransportFabricRequestPayload<U = any> implements ITransportFabricRequestPayload<U> {
     // --------------------------------------------------------------------------
@@ -14,10 +15,7 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
     //
     // --------------------------------------------------------------------------
 
-    /*
-    import { ChaincodeStub } from 'fabric-shim';
-    public static parse<U = any>(stub: ChaincodeStub, isNeedSetDefaultOptions: boolean): ITransportFabricRequestPayload<U> {
-        let item = stub.getFunctionAndParameters();
+    public static parse<U = any>(item: StubFunctionAndParameters, isNeedSetDefaultOptions: boolean): ITransportFabricRequestPayload<U> {
         if (item.fcn !== TRANSPORT_FABRIC_METHOD) {
             throw new TransportInvalidDataError(`Invalid payload: function must be "${TRANSPORT_FABRIC_METHOD}"`, item.fcn);
         }
@@ -37,7 +35,6 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         ValidateUtil.validate(payload);
         return payload;
     }
-    */
 
     public static clear<U>(payload: ITransportFabricRequestPayload<U>): void {
         TransportFabricRequestPayload.clearDefaultOptions(payload.options);
@@ -114,3 +111,5 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
     @IsBoolean()
     public isReadonly?: boolean;
 }
+
+export type StubFunctionAndParameters = { fcn: string, params: string[] };
