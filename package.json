@@ -1,0 +1,28 @@
+{
+    "name": "@hlf-core/transport-common",
+    "version": "3.0.0",
+    "description": "Hyperledger Fabric transport common classes",
+    "main": "index.js",
+    "author": {
+        "name": "Renat Gubaev",
+        "email": "renat.gubaev@gmail.com"
+    },
+    "license": "ISC",
+    "peerDependencies": {
+        "@ts-core/common": "^3.0.7"
+    },
+    "devDependencies": {
+        "gulp-npm-publisher": "^1.0.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ManhattanDoctor/hlf-core-transport-common"
+    },
+    "keywords": [
+        "typescript"
+    ],
+    "bugs": {
+        "url": "https://github.com/ManhattanDoctor/hlf-core-transport-common/issues"
+    },
+    "homepage": "https://github.com/ManhattanDoctor/hlf-core-transport-common#readme"
+}
