@@ -1,6 +1,6 @@
 {
     "name": "@hlf-core/transport-common",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Hyperledger Fabric transport common classes",
     "main": "index.js",
     "author": {
