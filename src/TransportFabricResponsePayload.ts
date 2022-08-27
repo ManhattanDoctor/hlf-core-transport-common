@@ -6,6 +6,7 @@ import { IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { ITransportFabricResponsePayload } from './ITransportFabricResponsePayload';
 
+
 export class TransportFabricResponsePayload<U = any, V = any> implements ITransportFabricResponsePayload<V> {
     // --------------------------------------------------------------------------
     //
