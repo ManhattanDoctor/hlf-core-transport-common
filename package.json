@@ -2,17 +2,24 @@
     "name": "@hlf-core/transport-common",
     "version": "3.0.2",
     "description": "Hyperledger Fabric transport common classes",
-    "main": "index.js",
+    "main": "./cjs/public-api.js",
+    "module": "./esm/public-api.js",
+    "exports": {
+        ".": {
+            "import": "./esm/public-api.js",
+            "require": "./cjs/public-api.js"
+        }
+    },
     "author": {
         "name": "Renat Gubaev",
         "email": "renat.gubaev@gmail.com"
     },
     "license": "ISC",
-    "peerDependencies": {
+    "dependencies": {
         "@ts-core/common": "^3.0.7"
     },
     "devDependencies": {
-        "gulp-npm-publisher": "^1.0.3"
+        "gulp-npm-module-publisher": "^3.0.0"
     },
     "repository": {
         "type": "git",
