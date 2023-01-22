@@ -1,7 +1,6 @@
 import { TransportCommandAsync } from "@ts-core/common";
 import { IChaincodeMetadata } from "./IChaincodeMetadata";
 
-
 export class ChaincodeMetadataGetCommand<V extends IChaincodeMetadata = IChaincodeMetadata> extends TransportCommandAsync<void, V> {
     // --------------------------------------------------------------------------
     //
