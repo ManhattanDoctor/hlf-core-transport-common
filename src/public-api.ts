@@ -9,5 +9,5 @@ export * from './TransportFabricResponsePayload';
 export * from './constants';
 //
 export * from './metadata/ChaincodeMode';
-export * from './metadata/IChaincodeMetaData';
+export * from './metadata/IChaincodeMetadata';
 export * from './metadata/ChaincodeMetadataGetCommand';
