@@ -16,7 +16,7 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@ts-core/common": "~3.0.12"
+        "@ts-core/common": "~3.0.13"
     },
     "devDependencies": {
         "gulp-npm-module-publisher": "~3.0.0"
