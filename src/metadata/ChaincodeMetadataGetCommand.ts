@@ -1,7 +1,7 @@
-import { TransportCommandAsync } from "@ts-core/common";
+import { TransportFabricCommandAsync } from "../TransportFabricCommandAsync";
 import { IChaincodeMetadata } from "./IChaincodeMetadata";
 
-export class ChaincodeMetadataGetCommand<V extends IChaincodeMetadata = IChaincodeMetadata> extends TransportCommandAsync<void, V> {
+export class ChaincodeMetadataGetCommand<V extends IChaincodeMetadata = IChaincodeMetadata> extends TransportFabricCommandAsync<void, V> {
     // --------------------------------------------------------------------------
     //
     //  Public Static Properties
@@ -17,6 +17,6 @@ export class ChaincodeMetadataGetCommand<V extends IChaincodeMetadata = IChainco
     // --------------------------------------------------------------------------
 
     constructor() {
-        super(ChaincodeMetadataGetCommand.NAME);
+        super(ChaincodeMetadataGetCommand.NAME, null, null, true);
     }
 }

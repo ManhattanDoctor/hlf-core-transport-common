@@ -5,6 +5,7 @@ export * from './ITransportFabricResponsePayload';
 export * from './TransportFabricCommandOptions';
 export * from './TransportFabricRequestPayload';
 export * from './TransportFabricResponsePayload';
+export * from './TransportFabricCommandAsync';
 //
 export * from './constants';
 //
