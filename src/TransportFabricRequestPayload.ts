@@ -51,15 +51,7 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         if (_.isNil(options)) {
             options = payload.options = {};
         }
-        if (_.isNil(options.timeout)) {
-            options.timeout = Transport.DEFAULT_TIMEOUT;
-        }
-        if (_.isNil(options.waitDelay)) {
-            options.waitDelay = Transport.DEFAULT_WAIT_DELAY;
-        }
-        if (_.isNil(options.waitMaxCount)) {
-            options.waitMaxCount = Transport.DEFAULT_WAIT_MAX_COUNT;
-        }
+        Transport.setDefaultOptions(options);
         if (!_.isNil(options.signature) && _.isNil(options.signature.algorithm)) {
             options.signature.algorithm = TransportCryptoManagerEd25519.ALGORITHM;
         }
@@ -69,15 +61,7 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         if (_.isNil(options)) {
             return;
         }
-        if (options.timeout === Transport.DEFAULT_TIMEOUT) {
-            delete options.timeout;
-        }
-        if (options.waitDelay === Transport.DEFAULT_WAIT_DELAY) {
-            delete options.waitDelay;
-        }
-        if (options.waitMaxCount === Transport.DEFAULT_WAIT_MAX_COUNT) {
-            delete options.waitMaxCount;
-        }
+        Transport.clearDefaultOptions(options);
         if (!_.isNil(options.signature) && options.signature.algorithm === TransportCryptoManagerEd25519.ALGORITHM) {
             delete options.signature.algorithm;
         }
