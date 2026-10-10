@@ -41,6 +41,12 @@ export class TransportFabricRequestPayload<U = any> implements ITransportFabricR
         if (_.isEmpty(payload.options)) {
             delete payload.options;
         }
+        if (payload.isReadonly === false) {
+            delete payload.isReadonly;
+        }
+        if (payload.isNeedReply === false) {
+            delete payload.isNeedReply;
+        }
     }
 
     public static setDefaultOptions<U>(payload: ITransportFabricRequestPayload<U>): void {
