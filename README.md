@@ -1,61 +1,66 @@
+**English** · [Русский](./README.ru.md)
+
 # @hlf-core/transport-common
 
-> TypeScript библиотека с общим протоколом транспорта Hyperledger Fabric: конверты запроса и ответа, подписи, команды
+> TypeScript library with the common Hyperledger Fabric transport protocol: request and response envelopes, signatures, commands
 
 [![npm version](https://img.shields.io/npm/v/@hlf-core/transport-common.svg)](https://www.npmjs.com/package/@hlf-core/transport-common)
+[![Docs](https://img.shields.io/badge/docs-hlf.gnosisai.ru-1f6feb)](https://hlf.gnosisai.ru/docs/packages/transport-common)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
-Общая часть транспорта между клиентом и chaincode: формат конвертов запроса и ответа, опции команды с подписью, базовый класс команд и служебные константы протокола.
+Full documentation: https://hlf.gnosisai.ru/docs/packages/transport-common
 
-Пакет используется обеими сторонами — клиентской (`@hlf-core/transport`) и chaincode (`@hlf-core/transport-chaincode`), — и содержит только то, что должно совпадать у отправителя и получателя. Он не зависит ни от `fabric-network`, ни от `fabric-shim`.
+The shared part of the transport between the client and the chaincode: the format of the request and response envelopes, command options with a signature, the base command class, and the protocol service constants.
 
-## Содержание
+The package is used by both sides — the client side (`@hlf-core/transport`) and the chaincode side (`@hlf-core/transport-chaincode`) — and contains only what must match between sender and receiver. It depends on neither `fabric-network` nor `fabric-shim`.
 
-- [Описание](#описание)
-  - [Основные возможности](#основные-возможности)
-- [Установка](#установка)
-  - [Зависимости](#зависимости)
-- [Как работает транспорт](#как-работает-транспорт)
-  - [Единая точка входа](#единая-точка-входа)
-  - [Путь команды](#путь-команды)
-  - [Подпись и nonce](#подпись-и-nonce)
-  - [Команды на чтение и на запись](#команды-на-чтение-и-на-запись)
-  - [События](#события)
-- [API документация](#api-документация)
-  - [Константы протокола](#константы-протокола)
+## Table of Contents
+
+- [Overview](#overview)
+  - [Key Features](#key-features)
+- [Installation](#installation)
+  - [Dependencies](#dependencies)
+- [How the Transport Works](#how-the-transport-works)
+  - [Single Entry Point](#single-entry-point)
+  - [Command Path](#command-path)
+  - [Signature and Nonce](#signature-and-nonce)
+  - [Read and Write Commands](#read-and-write-commands)
+  - [Events](#events)
+- [API Documentation](#api-documentation)
+  - [Protocol Constants](#protocol-constants)
   - [TransportFabricCommandAsync](#transportfabriccommandasync)
   - [TransportFabricCommandOptions](#transportfabriccommandoptions)
   - [TransportFabricRequestPayload](#transportfabricrequestpayload)
   - [TransportFabricResponsePayload](#transportfabricresponsepayload)
   - [NonceGetCommand](#noncegetcommand)
-  - [Метаданные chaincode](#метаданные-chaincode)
-- [Примеры использования](#примеры-использования)
-- [Структура проекта](#структура-проекта)
-- [Связанные пакеты](#связанные-пакеты)
+  - [Chaincode Metadata](#chaincode-metadata)
+- [Usage Examples](#usage-examples)
+- [Project Structure](#project-structure)
+- [Related Packages](#related-packages)
 
-## Описание
+## Overview
 
-Взаимодействие с chaincode в этой экосистеме построено не на множестве функций контракта, а на одной: любая команда упаковывается в конверт и отправляется через единственный метод. Что именно вызвано, определяет поле `name` внутри конверта, а не имя функции chaincode.
+Interaction with the chaincode in this ecosystem is built not around a set of contract functions, but around a single one: every command is wrapped in an envelope and sent through a single method. What exactly was invoked is determined by the `name` field inside the envelope, not by the name of a chaincode function.
 
-`@hlf-core/transport-common` описывает этот конверт с обеих сторон: как он сериализуется клиентом, как разбирается и проверяется chaincode, и что возвращается обратно. Пока обе стороны используют один и тот же пакет, протокол не может разъехаться.
+`@hlf-core/transport-common` describes this envelope on both sides: how it is serialized by the client, how it is parsed and verified by the chaincode, and what is returned back. As long as both sides use the same package, the protocol cannot drift apart.
 
-### Основные возможности
+### Key Features
 
-- **Конверт запроса** — `TransportFabricRequestPayload` с разбором, валидацией и работой со значениями по умолчанию
-- **Конверт ответа** — `TransportFabricResponsePayload`, одинаково переносящий результат и ошибку
-- **Опции с подписью** — `TransportFabricCommandOptions` добавляет к стандартным опциям идентификатор пользователя и криптографическую подпись
-- **Базовый класс команд** — `TransportFabricCommandAsync` с признаком `isReadonly`
-- **Защита от повтора** — `NonceGetCommand` для получения текущего nonce пользователя
-- **Метаданные chaincode** — `ChaincodeMetadataGetCommand`, режим работы и настройки пакетной обработки
-- **Константы протокола** — имена метода, события и пакетной команды, общие для обеих сторон
+- **Request envelope** — `TransportFabricRequestPayload` with parsing, validation, and handling of default values
+- **Response envelope** — `TransportFabricResponsePayload`, carrying a result and an error in the same way
+- **Options with a signature** — `TransportFabricCommandOptions` adds a user identifier and a cryptographic signature to the standard options
+- **Base command class** — `TransportFabricCommandAsync` with an `isReadonly` flag
+- **Replay protection** — `NonceGetCommand` for retrieving the user's current nonce
+- **Chaincode metadata** — `ChaincodeMetadataGetCommand`, the operating mode, and batch processing settings
+- **Protocol constants** — the names of the method, the event, and the batch command, shared by both sides
 
-## Установка
+## Installation
 
 ```bash
 npm install @hlf-core/transport-common
 ```
 
-### Зависимости
+### Dependencies
 
 ```json
 {
@@ -63,19 +68,19 @@ npm install @hlf-core/transport-common
 }
 ```
 
-Пакет поставляется в двух сборках — ESM (`./esm/public-api.js`) и CommonJS (`./cjs/public-api.js`), выбор происходит автоматически через поле `exports`.
+The package ships in two builds — ESM (`./esm/public-api.js`) and CommonJS (`./cjs/public-api.js`); the choice is made automatically through the `exports` field.
 
-## Как работает транспорт
+## How the Transport Works
 
-### Единая точка входа
+### Single Entry Point
 
-Все команды идут через одну функцию chaincode:
+All commands go through a single chaincode function:
 
 ```ts
 export const TRANSPORT_FABRIC_METHOD = 'transportFabricExecute';
 ```
 
-Клиент создаёт транзакцию именно с этим именем и передаёт ровно один параметр — сериализованный конверт запроса. Chaincode на входе проверяет и то, и другое:
+The client creates a transaction with exactly this name and passes exactly one parameter — the serialized request envelope. On input, the chaincode validates both:
 
 ```ts
 if (item.fcn !== TRANSPORT_FABRIC_METHOD) {
@@ -86,52 +91,52 @@ if (item.params.length !== 1) {
 }
 ```
 
-Благодаря этому добавление новой команды не требует ни изменения контракта, ни переустановки chaincode с новым набором функций — достаточно зарегистрировать обработчик по имени команды.
+Thanks to this, adding a new command requires neither changing the contract nor reinstalling the chaincode with a new set of functions — it is enough to register a handler by the command name.
 
-### Путь команды
+### Command Path
 
 ```
-клиент                                          chaincode
+client                                          chaincode
 ──────                                          ─────────
 new SomeCommand(request)
    │
    ├─ createRequestPayload()
    │     id, name, request, options, isReadonly, isNeedReply
    │
-   ├─ clear()  ──────── убирает значения по умолчанию
+   ├─ clear()  ──────── removes default values
    │
    └─ transaction(TRANSPORT_FABRIC_METHOD).submit(payload)
                           │
                           └──────────────►  TransportFabricRequestPayload.parse()
-                                               ├─ проверка имени функции и числа параметров
-                                               ├─ setDefaultOptions() — восстановление умолчаний
+                                               ├─ check the function name and the number of parameters
+                                               ├─ setDefaultOptions() — restore defaults
                                                ├─ ValidateUtil.validate()
-                                               ├─ проверка подписи и nonce
-                                               └─ выполнение обработчика команды
+                                               ├─ check the signature and nonce
+                                               └─ run the command handler
                                                         │
    TransportFabricResponsePayload.parse()  ◄────────────┘
-      id, response: результат либо ошибка
+      id, response: result or error
 ```
 
-Обратите внимание на пару `clear()` / `setDefaultOptions()`. Перед отправкой из конверта вычищаются все значения, совпадающие с умолчаниями, а на приёмнике они восстанавливаются. Это уменьшает размер того, что уходит в леджер: значения по умолчанию хранить в блоке незачем, а восстановить их можно детерминированно.
+Note the `clear()` / `setDefaultOptions()` pair. Before sending, all values that match the defaults are stripped from the envelope, and they are restored on the receiver. This reduces the size of what goes into the ledger: there is no point in storing default values in the block, and they can be restored deterministically.
 
-Частный случай — алгоритм подписи: `Ed25519` считается умолчанием и по сети не передаётся вовсе.
+A special case is the signature algorithm: `Ed25519` is treated as the default and is not transmitted over the network at all.
 
 ```ts
-// перед отправкой
+// before sending
 if (!_.isNil(options.signature) && options.signature.algorithm === TransportCryptoManagerEd25519.ALGORITHM) {
     delete options.signature.algorithm;
 }
 
-// на приёмнике
+// on the receiver
 if (!_.isNil(options.signature) && _.isNil(options.signature.algorithm)) {
     options.signature.algorithm = TransportCryptoManagerEd25519.ALGORITHM;
 }
 ```
 
-### Подпись и nonce
+### Signature and Nonce
 
-Fabric аутентифицирует организацию, от имени которой отправлена транзакция, но не конечного пользователя приложения. Поэтому конверт несёт собственную подпись:
+Fabric authenticates the organization on whose behalf the transaction is sent, but not the end user of the application. For this reason the envelope carries its own signature:
 
 ```ts
 export interface ITransportFabricCommandOptions extends ITransportCommandOptions {
@@ -140,23 +145,23 @@ export interface ITransportFabricCommandOptions extends ITransportCommandOptions
 }
 ```
 
-Подпись содержит значение, алгоритм, публичный ключ и `nonce`. Chaincode проверяет её сам: находит crypto manager по алгоритму, сверяет подпись команды и отдельно проверяет `nonce` — он обязан быть числовой строкой и строго больше предыдущего значения, сохранённого для этого пользователя. Так повторная отправка ранее подписанного конверта отбрасывается.
+The signature contains a value, an algorithm, a public key, and a `nonce`. The chaincode verifies it on its own: it finds a crypto manager by the algorithm, checks the command signature, and separately checks the `nonce` — it must be a numeric string and strictly greater than the previous value stored for this user. This way a resend of a previously signed envelope is rejected.
 
-Текущее значение запрашивается командой `NonceGetCommand` — клиент берёт его, увеличивает и подписывает следующую команду.
+The current value is requested with the `NonceGetCommand` command — the client takes it, increments it, and signs the next command.
 
-### Команды на чтение и на запись
+### Read and Write Commands
 
-Признак `isReadonly` определяет поведение на обеих сторонах.
+The `isReadonly` flag determines the behavior on both sides.
 
-На клиенте он выбирает способ отправки:
+On the client it selects the way of sending:
 
 ```ts
 let method = payload.isReadonly ? transaction.evaluate : transaction.submit;
 ```
 
-`evaluate` выполняет команду на peer без создания транзакции — результат возвращается, но в леджер ничего не попадает. `submit` проводит полный цикл с подтверждением и записью.
+`evaluate` runs the command on a peer without creating a transaction — the result is returned, but nothing ends up in the ledger. `submit` performs the full cycle with endorsement and a write.
 
-На стороне chaincode тот же признак решает судьбу nonce:
+On the chaincode side the same flag decides the fate of the nonce:
 
 ```ts
 if (!payload.isReadonly) {
@@ -164,41 +169,41 @@ if (!payload.isReadonly) {
 }
 ```
 
-Для команды на чтение nonce проверяется, но не сохраняется — иначе запрос менял бы состояние, чего `evaluate` сделать не может.
+For a read command the nonce is checked but not saved — otherwise the request would change state, which `evaluate` cannot do.
 
-Из этого следует практическое правило: команда, помеченная `isReadonly`, не должна изменять состояние, а команда, изменяющая состояние, обязана быть не readonly.
+From this follows a practical rule: a command marked `isReadonly` must not change state, and a command that changes state must not be readonly.
 
-### События
+### Events
 
-События chaincode передаются под одним общим именем:
+Chaincode events are delivered under a single common name:
 
 ```ts
 export const TRANSPORT_CHAINCODE_EVENT = 'transportFabricEvent';
 ```
 
-Парсер блоков на клиенте отличает транспортные события от прочих именно по нему и разбирает их содержимое как события транспорта.
+The block parser on the client distinguishes transport events from the rest by exactly this name and parses their content as transport events.
 
-Отдельное имя зарезервировано для пакетной обработки:
+A separate name is reserved for batch processing:
 
 ```ts
 export const TRANSPORT_FABRIC_COMMAND_BATCH_NAME = 'transportFabricBatch';
 ```
 
-По нему в блоке находится транзакция, содержащая пакет команд.
+By this name, the transaction containing a batch of commands is located in the block.
 
-## API документация
+## API Documentation
 
-### Константы протокола
+### Protocol Constants
 
-| Константа | Значение | Назначение |
+| Constant | Value | Purpose |
 |---|---|---|
-| `TRANSPORT_FABRIC_METHOD` | `transportFabricExecute` | единственная функция chaincode, через которую проходят все команды |
-| `TRANSPORT_CHAINCODE_EVENT` | `transportFabricEvent` | имя события chaincode для событий транспорта |
-| `TRANSPORT_FABRIC_COMMAND_BATCH_NAME` | `transportFabricBatch` | имя команды пакетной обработки |
+| `TRANSPORT_FABRIC_METHOD` | `transportFabricExecute` | the single chaincode function through which all commands pass |
+| `TRANSPORT_CHAINCODE_EVENT` | `transportFabricEvent` | the chaincode event name for transport events |
+| `TRANSPORT_FABRIC_COMMAND_BATCH_NAME` | `transportFabricBatch` | the name of the batch processing command |
 
 ### TransportFabricCommandAsync
 
-Базовый класс команды, ожидающей ответ.
+The base class for a command that expects a response.
 
 ```ts
 export class TransportFabricCommandAsync<U, V> extends TransportCommandAsync<U, V> {
@@ -208,11 +213,11 @@ export class TransportFabricCommandAsync<U, V> extends TransportCommandAsync<U, 
 }
 ```
 
-`U` — тип запроса, `V` — тип ответа. По умолчанию команда считается изменяющей состояние; `isReadonly` нужно указывать явно.
+`U` is the request type, `V` is the response type. By default a command is considered to change state; `isReadonly` must be specified explicitly.
 
 ### TransportFabricCommandOptions
 
-Опции команды, расширенные данными пользователя.
+Command options extended with user data.
 
 ```ts
 export class TransportFabricCommandOptions extends TransportCommandOptions implements ITransportFabricCommandOptions {
@@ -224,11 +229,11 @@ export class TransportFabricCommandOptions extends TransportCommandOptions imple
 }
 ```
 
-Наследует стандартные опции `@ts-core/common` (таймаут, число попыток, приоритет) и добавляет `userId` и `signature`. Поля размечены декораторами `class-validator`, поэтому конверт проверяется на приёмнике целиком, вместе с вложенной подписью.
+It inherits the standard `@ts-core/common` options (timeout, number of retries, priority) and adds `userId` and `signature`. The fields are annotated with `class-validator` decorators, so the envelope is validated on the receiver as a whole, together with the nested signature.
 
 ### TransportFabricRequestPayload
 
-Конверт запроса.
+The request envelope.
 
 ```ts
 export interface ITransportFabricRequestPayload<U = any> {
@@ -242,18 +247,18 @@ export interface ITransportFabricRequestPayload<U = any> {
 }
 ```
 
-| Поле | Назначение |
+| Field | Purpose |
 |---|---|
-| `id` | идентификатор команды, по нему сопоставляется ответ |
-| `name` | имя команды — определяет, какой обработчик будет вызван |
-| `request` | полезная нагрузка команды |
-| `options` | опции вместе с подписью и идентификатором пользователя |
-| `isReadonly` | команда не изменяет состояние |
-| `isNeedReply` | отправитель ожидает ответ |
+| `id` | the command identifier, used to match the response |
+| `name` | the command name — determines which handler will be invoked |
+| `request` | the command payload |
+| `options` | the options together with the signature and the user identifier |
+| `isReadonly` | the command does not change state |
+| `isNeedReply` | the sender expects a response |
 
 #### `parse(item: StubFunctionAndParameters, isNeedSetDefaultOptions: boolean)`
 
-Разбирает вызов chaincode в конверт. Проверяет имя функции и число параметров, десериализует содержимое, при необходимости восстанавливает значения по умолчанию и валидирует результат. При любой проблеме бросает `TransportInvalidDataError` с исходным содержимым в деталях.
+Parses a chaincode invocation into an envelope. It checks the function name and the number of parameters, deserializes the content, restores default values if necessary, and validates the result. On any problem it throws `TransportInvalidDataError` with the original content in the details.
 
 ```ts
 let payload = TransportFabricRequestPayload.parse({ fcn, params }, true);
@@ -261,15 +266,15 @@ let payload = TransportFabricRequestPayload.parse({ fcn, params }, true);
 
 #### `setDefaultOptions(payload)`
 
-Восстанавливает опции по умолчанию, включая алгоритм подписи `Ed25519`. Применяется на приёмнике.
+Restores the default options, including the `Ed25519` signature algorithm. Applied on the receiver.
 
-#### `clearDefaultOptions(options)` и `clear(payload)`
+#### `clearDefaultOptions(options)` and `clear(payload)`
 
-Обратная операция: убирает из конверта всё, что совпадает с умолчаниями, а `clear` дополнительно удаляет опции целиком, если после очистки они пусты. Применяется перед отправкой, чтобы не хранить в леджере предсказуемые значения.
+The reverse operation: it removes from the envelope everything that matches the defaults, and `clear` additionally removes the options entirely if they are empty after the cleanup. Applied before sending, so as not to store predictable values in the ledger.
 
 ### TransportFabricResponsePayload
 
-Конверт ответа.
+The response envelope.
 
 ```ts
 export interface ITransportFabricResponsePayload<V = any> {
@@ -278,11 +283,11 @@ export interface ITransportFabricResponsePayload<V = any> {
 }
 ```
 
-Успешный результат и ошибка занимают одно и то же поле — сторона-получатель различает их по типу. Благодаря этому ошибка chaincode доходит до клиента как объект с кодом и деталями, а не как строка в тексте исключения.
+A successful result and an error occupy the same field — the receiving side distinguishes them by type. Thanks to this, a chaincode error reaches the client as an object with a code and details, rather than as a string in the exception text.
 
-#### Конструктор `new TransportFabricResponsePayload(command?)`
+#### Constructor `new TransportFabricResponsePayload(command?)`
 
-Собирает ответ из выполненной команды: берёт её `id` и для асинхронной команды кладёт в `response` либо данные, либо ошибку.
+Builds a response from an executed command: it takes its `id` and, for an asynchronous command, puts either the data or the error into `response`.
 
 ```ts
 this.response = _.isNil(command.error) ? command.data : command.error;
@@ -290,15 +295,15 @@ this.response = _.isNil(command.error) ? command.data : command.error;
 
 #### `parse(buffer: Buffer)`
 
-Разбирает ответ из буфера. Пустой буфер и повреждённое содержимое дают `TransportInvalidDataError`.
+Parses a response from a buffer. An empty buffer and corrupted content produce `TransportInvalidDataError`.
 
 #### `fromError(id: string, error: ExtendedError)`
 
-Собирает ответ с ошибкой для случая, когда команду не удалось даже создать — например, конверт не прошёл разбор и `id` известен, а объекта команды ещё нет.
+Builds an error response for the case where the command could not even be created — for example, the envelope failed to parse and the `id` is known, but there is no command object yet.
 
 ### NonceGetCommand
 
-Команда получения текущего nonce пользователя.
+The command for retrieving the user's current nonce.
 
 ```ts
 export class NonceGetCommand extends TransportFabricCommandAsync<string, string> {
@@ -308,9 +313,9 @@ export class NonceGetCommand extends TransportFabricCommandAsync<string, string>
 }
 ```
 
-Помечена как readonly: значение только читается. Клиент запрашивает его перед подписанием команды, изменяющей состояние.
+Marked as readonly: the value is only read. The client requests it before signing a command that changes state.
 
-### Метаданные chaincode
+### Chaincode Metadata
 
 ```ts
 export enum ChaincodeMode {
@@ -331,18 +336,18 @@ export interface IChaincodeBatchSettings {
 }
 ```
 
-`ChaincodeMetadataGetCommand` — readonly команда, возвращающая эти метаданные. По ним клиент узнаёт имя chaincode, режим его работы и настройки пакетной обработки: интервал накопления команд и ключ, которым подписывается пакет.
+`ChaincodeMetadataGetCommand` is a readonly command that returns this metadata. From it the client learns the chaincode name, its operating mode, and the batch processing settings: the command accumulation interval and the key with which the batch is signed.
 
-Команда параметризуется типом метаданных, поэтому конкретный проект может расширить структуру своими полями:
+The command is parameterized by the metadata type, so a specific project can extend the structure with its own fields:
 
 ```ts
 class MyMetadata implements IChaincodeMetadata { ... }
 let command = new ChaincodeMetadataGetCommand<MyMetadata>();
 ```
 
-## Примеры использования
+## Usage Examples
 
-### Объявление команды
+### Declaring a Command
 
 ```ts
 import { TransportFabricCommandAsync } from '@hlf-core/transport-common';
@@ -356,12 +361,12 @@ export class UserAddCommand extends TransportFabricCommandAsync<IUserAddDto, IUs
     public static readonly NAME = 'UserAdd';
 
     constructor(request: IUserAddDto) {
-        super(UserAddCommand.NAME, request);   // изменяет состояние — submit
+        super(UserAddCommand.NAME, request);   // changes state — submit
     }
 }
 ```
 
-### Команда на чтение
+### A Read Command
 
 ```ts
 export class UserGetCommand extends TransportFabricCommandAsync<string, IUser> {
@@ -373,33 +378,33 @@ export class UserGetCommand extends TransportFabricCommandAsync<string, IUser> {
 }
 ```
 
-Четвёртый аргумент и есть `isReadonly`. Ошибиться здесь дорого в обе стороны: readonly-команда, пытающаяся записать состояние, не сможет этого сделать, а обычная команда на чтение будет создавать транзакции в леджере на каждый запрос.
+The fourth argument is `isReadonly`. A mistake here is costly in both directions: a readonly command trying to write state will not be able to do so, while an ordinary read command will create transactions in the ledger on every request.
 
-### Разбор запроса на стороне chaincode
+### Parsing a Request on the Chaincode Side
 
 ```ts
 import { TransportFabricRequestPayload } from '@hlf-core/transport-common';
 
 let payload = TransportFabricRequestPayload.parse(stub.getFunctionAndParameters(), true);
 
-console.log(payload.name);              // имя команды
-console.log(payload.options.userId);    // от чьего имени
-console.log(payload.options.signature); // подпись с nonce
+console.log(payload.name);              // the command name
+console.log(payload.options.userId);    // on whose behalf
+console.log(payload.options.signature); // the signature with nonce
 ```
 
-### Формирование ответа
+### Building a Response
 
 ```ts
 import { TransportFabricResponsePayload } from '@hlf-core/transport-common';
 
-// из выполненной команды
+// from an executed command
 let response = new TransportFabricResponsePayload(command);
 
-// из ошибки, когда команду создать не удалось
+// from an error, when the command could not be created
 let failure = TransportFabricResponsePayload.fromError(payload.id, new ExtendedError('Invalid request'));
 ```
 
-### Экономия размера конверта
+### Saving Envelope Size
 
 ```ts
 let payload = new TransportFabricRequestPayload();
@@ -408,59 +413,59 @@ payload.name = command.name;
 payload.request = command.request;
 payload.options = options;
 
-TransportFabricRequestPayload.clear(payload);   // убрать умолчания перед отправкой
+TransportFabricRequestPayload.clear(payload);   // remove defaults before sending
 ```
 
-После `clear` конверт содержит только то, что действительно отличается от значений по умолчанию. Приёмник восстановит остальное сам.
+After `clear` the envelope contains only what actually differs from the default values. The receiver will restore the rest on its own.
 
-## Структура проекта
+## Project Structure
 
 ```
 src/
-├── constants.ts                          имена метода, события и пакетной команды
-├── public-api.ts                         публичный API пакета
-├── ITransportFabricCommandOptions.ts     интерфейс опций с подписью
-├── TransportFabricCommandOptions.ts      реализация опций с валидацией
-├── TransportFabricCommandAsync.ts        базовая команда с isReadonly
-├── ITransportFabricRequestPayload.ts     интерфейс конверта запроса
-├── TransportFabricRequestPayload.ts      разбор, валидация, умолчания
-├── ITransportFabricResponsePayload.ts    интерфейс конверта ответа
-├── TransportFabricResponsePayload.ts     сборка ответа из команды или ошибки
+├── constants.ts                          names of the method, event, and batch command
+├── public-api.ts                         the package's public API
+├── ITransportFabricCommandOptions.ts     the options interface with a signature
+├── TransportFabricCommandOptions.ts      the options implementation with validation
+├── TransportFabricCommandAsync.ts        the base command with isReadonly
+├── ITransportFabricRequestPayload.ts     the request envelope interface
+├── TransportFabricRequestPayload.ts      parsing, validation, defaults
+├── ITransportFabricResponsePayload.ts    the response envelope interface
+├── TransportFabricResponsePayload.ts     building a response from a command or an error
 ├── nonce/
-│   ├── NonceGetCommand.ts                получение nonce пользователя
+│   ├── NonceGetCommand.ts                retrieving the user's nonce
 │   └── index.ts
 └── metadata/
-    ├── ChaincodeMode.ts                  режим работы chaincode
-    ├── IChaincodeMetadata.ts             метаданные и настройки пакетной обработки
-    ├── ChaincodeMetadataGetCommand.ts    команда получения метаданных
+    ├── ChaincodeMode.ts                  the chaincode operating mode
+    ├── IChaincodeMetadata.ts             metadata and batch processing settings
+    ├── ChaincodeMetadataGetCommand.ts    the command for retrieving metadata
     └── index.ts
 ```
 
-## Связанные пакеты
+## Related Packages
 
-| Пакет | Роль |
+| Package | Role |
 |---|---|
-| [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport) | клиентская сторона: отправка команд, разбор блоков и событий |
-| [@hlf-core/transport-chaincode](https://www.npmjs.com/package/@hlf-core/transport-chaincode) | сторона chaincode: приём команд, проверка подписи, выполнение обработчиков |
-| [@hlf-core/common](https://www.npmjs.com/package/@hlf-core/common) | базовые классы экосистемы: ключи состояния, идентификаторы, криптоключи |
+| [@hlf-core/transport](https://www.npmjs.com/package/@hlf-core/transport) | the client side: sending commands, parsing blocks and events |
+| [@hlf-core/transport-chaincode](https://www.npmjs.com/package/@hlf-core/transport-chaincode) | the chaincode side: receiving commands, verifying the signature, running handlers |
+| [@hlf-core/common](https://www.npmjs.com/package/@hlf-core/common) | the ecosystem's base classes: state keys, identifiers, crypto keys |
 
-## Лицензия
+## License
 
 ISC
 
-## Автор
+## Author
 
-**Ренат Губаев**
+**Renat Gubaev**
 - Email: renat.gubaev@gmail.com
 - GitHub: [@ManhattanDoctor](https://github.com/ManhattanDoctor)
 
-## Ссылки
+## Links
 
 - [GitHub Repository](https://github.com/ManhattanDoctor/hlf-core-transport-common)
 - [NPM Package](https://www.npmjs.com/package/@hlf-core/transport-common)
 - [Issue Tracker](https://github.com/ManhattanDoctor/hlf-core-transport-common/issues)
 - [Hyperledger Fabric Documentation](https://hyperledger-fabric.readthedocs.io/)
 
-## Поддержка
+## Support
 
-Если вы нашли баг или у вас есть предложение по улучшению, пожалуйста, создайте issue в [GitHub Issues](https://github.com/ManhattanDoctor/hlf-core-transport-common/issues).
+If you found a bug or have a suggestion for improvement, please create an issue in [GitHub Issues](https://github.com/ManhattanDoctor/hlf-core-transport-common/issues).
